@@ -4,7 +4,7 @@ const app=express();
 
 
 app.get("/user",(req,res)=>{
-    res.send({firstName:'ullas',lastName:'kiran'})
+    res.send({firstName:'test',lastName:'kiran'})
 })
 
 app.post("/user",async(req,res)=>{
