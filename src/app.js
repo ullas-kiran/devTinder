@@ -1,9 +1,12 @@
+require("dotenv").config();
 const express=require('express');
 const app=express();
-require('./config/database')
+const connectDb=require('./config/database')
 
-app.use("/",(req,res)=>{
-    res.send("hello from server")
+connectDb().then(()=>{
+console.log("db connected success")
+app.listen(3000,()=>(console.log("app running port 3000")))    
+}).catch((err)=>{
+console.log("something went wrong")
 })
-
-app.listen(3000,()=>(console.log("app running port 3000")))                 
+             
