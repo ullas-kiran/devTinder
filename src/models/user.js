@@ -13,6 +13,14 @@ const userSchema=mongoose.Schema({
     },
     password:{
         type:String
-    }
+    },
+    age:{
+        type:Number
+    },
+    gender:{
+        type:String
+    },
 
 })
+
+exports.User=mongoose.model('User',userSchema)
