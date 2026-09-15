@@ -2,137 +2,16 @@ require("dotenv").config();
 const express=require('express');
 const app=express();
 const connectDb=require('./config/database');
-const { User } = require("./models/user");
+const userRoutes = require("./routes/userRoutes");
+const errorHandler = require("./middleware/errorHandler");
 
 
 
 app.use(express.json());
+app.use("/api", userRoutes);
 
-app.post('/signup',async(req,res)=>{
-    const {firstName,lastName,emailId,password,age,gender}=req.body;
-    const user=await User.create({
-        firstName,
-        lastName,
-        emailId,
-        password,
-        age,
-        gender
-    })
-    res.status(201).json({
-        success:true,
-        user
-    })
-})
-
-app.get('/user', async (req, res) => {
-  try {
-    const { emailId } = req.query;
-
-    const user = await User.findOne({ emailId });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      user
-    });
-  } catch (error) {
-     if (error.code === 11000) {
-    return res.status(409).json({
-      success: false,
-      message: 'Email already exists'
-    });
-  }
-
-  res.status(500).json({
-    success: false,
-    message: 'Server error'
-  });
-  }
-});
-
-app.get('/feed', async (req, res) => {
-  try {
-    const { emailId } = req.query;
-
-    const user = await User.find({});
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      user
-    });
-  } catch (error) {
-  res.status(500).json({
-    success: false,
-    message: 'Server error'
-  });
-  }
-});
-
-app.delete('/user', async (req, res) => {
-  try{
-    const {userId } = req.query;
-
-    const user = await User.findOneAndDelete({userId});
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'User deleted successfully'
-    });
-  }catch(error){
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-app.patch('/user', async (req, res) => {
- try {
-    const { userId } = req.query;
-    const updateData = req.body;
-
-    const user = await User.findByIdAndUpdate({ userId }, updateData, { new: true });     
-    
-      if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'User updated successfully',
-      data: user
-    });
-
-}catch(error){
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
+// Global error middleware
+app.use(errorHandler);
 
 connectDb().then(()=>{
 console.log("db connected success")
