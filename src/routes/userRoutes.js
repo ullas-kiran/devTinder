@@ -8,6 +8,7 @@ const {
   updateUser
 } = require("../controllers/userController");
 const { signupSchema } = require("../validations/userValidation");
+const validate = require("../middleware/validate");
 
 const router = express.Router();
 

@@ -116,5 +116,8 @@ const getFeed = async (req, res, next) => {
 
 module.exports = {
   signup,
-  getUser
+  getUser,
+  updateUser,
+  deleteUser,
+  getFeed
 };
