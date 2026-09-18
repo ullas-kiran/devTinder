@@ -5,21 +5,29 @@ const {
   getUser,
   getFeed,
   deleteUser,
-  updateUser
+  updateUser,
 } = require("../controllers/userController");
-const { signupSchema } = require("../validations/userValidation");
+const {
+  signupSchema,
+  updateUserSchema,
+} = require("../validations/userValidation");
 const validate = require("../middleware/validate");
 
 const router = express.Router();
 
-router.post("/signup", validate(signupSchema), signup);
+router.post("/users", validate(signupSchema), signup);
 
-router.get("/user", getUser);
+router.get("/users/:userId", validate(userIdSchema, "params"), getUser);
 
-router.get("/feed", getFeed);
+router.patch(
+  "/users/:userId",
+  validate(userIdSchema, "params"),
+  validate(updateUserSchema),
+  updateUser,
+);
 
-router.delete("/user", deleteUser);
+router.delete("/users/:userId", validate(userIdSchema, "params"), deleteUser);
 
-router.patch("/user", updateUser);
+router.get("/users", getFeed);
 
 module.exports = router;

@@ -1,16 +1,16 @@
-const validate = (schema) => {
+const validate = (schema, source = "body") => {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body);
+    const result = schema.safeParse(req[source]);
 
     if (!result.success) {
       return res.status(400).json({
         success: false,
         message: "Validation failed",
-        errors: result.error.issues
+        errors: result.error.issues,
       });
     }
 
-    req.body = result.data;
+    req[source] = result.data;
 
     next();
   };

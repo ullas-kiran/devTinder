@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/app.js",
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "keywords": [
     "javascript",
@@ -14,12 +18,17 @@
   "author": "ullas kiran",
   "license": "ISC",
   "dependencies": {
+    "argon2": "0.45.1",
     "dotenv": "17.4.2",
     "express": "5.1.0",
     "mongoose": "9.10.1",
     "zod": "4.6.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "eslint": "10.10.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.12.0",
+    "nodemon": "3.1.14",
+    "prettier": "3.9.8"
   }
 }
