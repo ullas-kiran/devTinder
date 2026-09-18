@@ -10,6 +10,8 @@ const {
 const {
   signupSchema,
   updateUserSchema,
+  userIdSchema,
+  feedQuerySchema,
 } = require("../validations/userValidation");
 const validate = require("../middleware/validate");
 
@@ -28,6 +30,6 @@ router.patch(
 
 router.delete("/users/:userId", validate(userIdSchema, "params"), deleteUser);
 
-router.get("/users", getFeed);
+router.get("/users", validate(feedQuerySchema, "query"), getFeed);
 
 module.exports = router;

@@ -1,46 +1,20 @@
-const mongoose = require("mongoose");
 const { User } = require("../models/user");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 
-// Fields safe to return in API responses
-const publicUserFields =
-  "firstName lastName emailId age gender photoUrl about skills";
-
-// Fields allowed to be updated through the profile endpoint
-const editableUserFields = [
-  "firstName",
-  "lastName",
-  "age",
-  "gender",
-  "photoUrl",
-  "about",
-  "skills",
-];
-
-// Validate MongoDB ObjectId
-const assertValidUserId = (userId) => {
-  if (!mongoose.isObjectIdOrHexString(userId)) {
-    throw ApiError.badRequest("Invalid user ID");
-  }
-};
-
-// Pick only allowed fields from request body
-const pickEditableFields = (body) => {
-  const updateData = {};
-
-  for (const field of editableUserFields) {
-    if (body[field] !== undefined) {
-      updateData[field] = body[field];
-    }
-  }
-
-  return updateData;
-};
+const publicProfileFields =
+  "firstName lastName age gender photoUrl about skills";
 
 // POST /users
 const signup = async (req, res, next) => {
   try {
-    const { firstName, lastName, emailId, password, age, gender } = req.body;
+    const {
+      firstName,
+      lastName,
+      emailId,
+      password,
+      age,
+      gender,
+    } = req.body;
 
     const user = await User.create({
       firstName,
@@ -51,21 +25,19 @@ const signup = async (req, res, next) => {
       gender,
     });
 
-    const publicUser = {
-      id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      emailId: user.emailId,
-      age: user.age,
-      gender: user.gender,
-      photoUrl: user.photoUrl,
-      about: user.about,
-      skills: user.skills,
-    };
-
     return res.status(201).json({
       success: true,
-      user: publicUser,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        emailId: user.emailId,
+        age: user.age,
+        gender: user.gender,
+        photoUrl: user.photoUrl,
+        about: user.about,
+        skills: user.skills,
+      },
     });
   } catch (error) {
     next(error);
@@ -77,9 +49,9 @@ const getUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    assertValidUserId(userId);
-
-    const user = await User.findById(userId).select(publicUserFields).lean();
+    const user = await User.findById(userId)
+      .select(publicProfileFields)
+      .lean();
 
     if (!user) {
       throw ApiError.notFound("User not found");
@@ -99,25 +71,17 @@ const updateUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    assertValidUserId(userId);
-
-    const updateData = pickEditableFields(req.body);
-
-    if (Object.keys(updateData).length === 0) {
-      throw ApiError.badRequest(
-        "At least one valid field is required to update",
-      );
-    }
-
     const user = await User.findByIdAndUpdate(
       userId,
-      { $set: updateData },
+      {
+        $set: req.body,
+      },
       {
         new: true,
         runValidators: true,
       },
     )
-      .select(publicUserFields)
+      .select(publicProfileFields)
       .lean();
 
     if (!user) {
@@ -139,8 +103,6 @@ const deleteUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    assertValidUserId(userId);
-
     const user = await User.findByIdAndDelete(userId);
 
     if (!user) {
@@ -159,19 +121,14 @@ const deleteUser = async (req, res, next) => {
 // GET /users
 const getFeed = async (req, res, next) => {
   try {
-    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
-
-    const limit = Math.min(
-      Math.max(Number.parseInt(req.query.limit, 10) || 20, 1),
-      100,
-    );
+    const { page, limit } = req.query;
 
     const skip = (page - 1) * limit;
 
     const [users, total] = await Promise.all([
       User.find({})
-        .select(publicUserFields)
-        .sort({ createdAt: -1 })
+        .select(publicProfileFields)
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),

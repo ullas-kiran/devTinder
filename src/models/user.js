@@ -1,3 +1,4 @@
+const { argon2d } = require("argon2");
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema(
@@ -73,7 +74,7 @@ userSchema.pre("save", async function (next) {
       return next();
     }
 
-    this.password = await argon2.hash(this.password);
+    this.password = await argon2d.hash(this.password);
 
     next();
   } catch (error) {
@@ -85,7 +86,7 @@ userSchema.pre("save", async function (next) {
  * Compare plain password with stored password hash.
  */
 userSchema.methods.comparePassword = async function (plainPassword) {
-  return argon2.verify(this.password, plainPassword);
+  return argon2d.verify(this.password, plainPassword);
 };
 
 exports.User = mongoose.model("User", userSchema);
