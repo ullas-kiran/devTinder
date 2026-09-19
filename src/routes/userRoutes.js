@@ -17,7 +17,7 @@ const validate = require("../middleware/validate");
 
 const router = express.Router();
 
-router.post("/users", validate(signupSchema), signup);
+router.post("/signup", validate(signupSchema), signup);
 
 router.get("/users/:userId", validate(userIdSchema, "params"), getUser);
 

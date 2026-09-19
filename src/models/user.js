@@ -1,4 +1,4 @@
-const { argon2d } = require("argon2");
+const argon2 = require("argon2");
 const validator = require("validator");
 const mongoose = require("mongoose");
 
@@ -30,8 +30,6 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 8,
-      maxlength: 100,
       select: false,
       validate: {
         validator: validator.isStrongPassword,
@@ -79,17 +77,8 @@ const userSchema = mongoose.Schema(
  * Hash password before saving.
  */
 userSchema.pre("save", async function (next) {
-  try {
-    // Don't hash if password hasn't changed
-    if (!this.isModified("password")) {
-      return next();
-    }
-
-    this.password = await argon2d.hash(this.password);
-
-    next();
-  } catch (error) {
-    next(error);
+  if (this.isModified("password")) {
+    this.password = await argon2.hash(this.password);
   }
 });
 
@@ -97,7 +86,7 @@ userSchema.pre("save", async function (next) {
  * Compare plain password with stored password hash.
  */
 userSchema.methods.comparePassword = async function (plainPassword) {
-  return argon2d.verify(this.password, plainPassword);
+  return argon2.verify(this.password, plainPassword);
 };
 
 exports.User = mongoose.model("User", userSchema);

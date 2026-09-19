@@ -55,6 +55,7 @@ module.exports = [
         {
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
 
@@ -69,18 +70,42 @@ module.exports = [
       "no-var": "error",
       "prefer-const": "error",
       "no-throw-literal": "error",
+      "consistent-return": "error",
 
       // --------------------------------------------------------
       // Debugging / logging
       // --------------------------------------------------------
       "no-debugger": "error",
-      "no-console": "warn",
+
+      "no-console": [
+        "warn",
+        {
+          allow: ["error", "warn"],
+        },
+      ],
+
+      // --------------------------------------------------------
+      // Restrict bare return statements
+      // --------------------------------------------------------
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ReturnStatement:not([argument])",
+          message: "Avoid bare return statements.",
+        },
+      ],
+
+      // --------------------------------------------------------
+      // Error handling
+      // --------------------------------------------------------
+      "no-throw-literal": "error",
 
       // --------------------------------------------------------
       // Formatting
       // Prettier is the source of truth for formatting.
       // --------------------------------------------------------
       semi: ["error", "always"],
+
       quotes: [
         "error",
         "double",
@@ -88,6 +113,7 @@ module.exports = [
           avoidEscape: true,
         },
       ],
+
       "comma-dangle": ["error", "always-multiline"],
     },
   },
