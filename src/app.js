@@ -17,6 +17,6 @@ connectDb()
     app.listen(3000, () => console.log("app running port 3000"));
   })
   .catch((err) => {
-    console.log(err);
+    console.error(err);
     console.log("something went wrong");
   });

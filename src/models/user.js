@@ -1,4 +1,5 @@
 const { argon2d } = require("argon2");
+const validator = require("validator");
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema(
@@ -21,7 +22,10 @@ const userSchema = mongoose.Schema(
       trim: true,
       required: true,
       unique: true,
-      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      validate: {
+        validator: validator.isEmail,
+        message: "Invalid email address",
+      },
     },
     password: {
       type: String,
@@ -29,6 +33,9 @@ const userSchema = mongoose.Schema(
       minlength: 8,
       maxlength: 100,
       select: false,
+      validate: {
+        validator: validator.isStrongPassword,
+      },
     },
     age: {
       type: Number,
@@ -43,6 +50,10 @@ const userSchema = mongoose.Schema(
       type: String,
       default:
         "https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG.png",
+      validate: {
+        validator: validator.isURL,
+        message: "Invalid photo URL",
+      },
     },
     about: {
       type: String,

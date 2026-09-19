@@ -1,21 +1,55 @@
 const globals = require("globals");
 const eslintConfigPrettier = require("eslint-config-prettier");
+const simpleImportSort = require("eslint-plugin-simple-import-sort");
 
 module.exports = [
+  // ============================================================
+  // JavaScript source files
+  // ============================================================
   {
     files: ["**/*.js"],
-    ignores: ["node_modules/**", "coverage/**", "dist/**", "build/**", ".env"],
 
+    ignores: [
+      "node_modules/**",
+      "coverage/**",
+      "dist/**",
+      "build/**",
+      ".env",
+      ".env.*",
+    ],
+
+    // ==========================================================
+    // Language configuration
+    // ==========================================================
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "commonjs",
+
       globals: {
         ...globals.node,
       },
     },
 
+    // ==========================================================
+    // Plugins
+    // ==========================================================
+    plugins: {
+      "simple-import-sort": simpleImportSort,
+    },
+
+    // ==========================================================
+    // Rules
+    // ==========================================================
     rules: {
+      // --------------------------------------------------------
+      // Import / require order
+      // --------------------------------------------------------
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
+
+      // --------------------------------------------------------
       // Possible bugs
+      // --------------------------------------------------------
       "no-unused-vars": [
         "error",
         {
@@ -27,23 +61,26 @@ module.exports = [
       "no-undef": "error",
       "no-unreachable": "error",
 
+      // --------------------------------------------------------
       // Code quality
+      // --------------------------------------------------------
       eqeqeq: ["error", "always"],
       curly: ["error", "all"],
       "no-var": "error",
       "prefer-const": "error",
-
-      // Better error handling
       "no-throw-literal": "error",
 
-      // Clean code
-      "no-console": "warn",
+      // --------------------------------------------------------
+      // Debugging / logging
+      // --------------------------------------------------------
       "no-debugger": "error",
+      "no-console": "warn",
 
-      // Prevent accidental semicolon issues
+      // --------------------------------------------------------
+      // Formatting
+      // Prettier is the source of truth for formatting.
+      // --------------------------------------------------------
       semi: ["error", "always"],
-
-      // Consistent quotes
       quotes: [
         "error",
         "double",
@@ -51,12 +88,12 @@ module.exports = [
           avoidEscape: true,
         },
       ],
-
-      // Consistent commas
       "comma-dangle": ["error", "always-multiline"],
     },
   },
 
-  // Disable ESLint formatting rules that conflict with Prettier
+  // ============================================================
+  // Prettier compatibility
+  // ============================================================
   eslintConfigPrettier,
 ];
