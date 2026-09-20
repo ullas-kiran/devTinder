@@ -27,6 +27,18 @@ const userSchema = mongoose.Schema(
         message: "Invalid email address",
       },
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationTokenHash: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpiresAt: {
+      type: Date,
+      select: false,
+    },
     password: {
       type: String,
       required: true,
@@ -76,7 +88,7 @@ const userSchema = mongoose.Schema(
 /*
  * Hash password before saving.
  */
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (this.isModified("password")) {
     this.password = await argon2.hash(this.password);
   }

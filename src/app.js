@@ -4,6 +4,7 @@ const app = express();
 const connectDb = require("./config/database");
 const userRoutes = require("./routes/userRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const startCleanupJob = require("./jobs/cleanupUnverifiedUsers");
 
 app.use(express.json());
 app.use("/api", userRoutes);
@@ -20,3 +21,5 @@ connectDb()
     console.error(err);
     console.log("something went wrong");
   });
+
+startCleanupJob();
