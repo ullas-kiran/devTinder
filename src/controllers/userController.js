@@ -1,49 +1,8 @@
-const { EMAIL_VERIFICATION_EXPIRY_MS } = require("../constants/auth");
 const { User } = require("../models/user");
-const { sendVerificationEmail } = require("../services/emailService");
 const ApiError = require("../utils/apiError");
-const { generateVerificationToken } = require("../utils/token");
 
 const publicProfileFields =
   "firstName lastName age gender photoUrl about skills";
-
-// POST /users
-const signup = async (req, res) => {
-  const { firstName, lastName, emailId, password, age, gender } = req.body;
-
-  const { token, tokenHash } = generateVerificationToken();
-
-  const user = await User.create({
-    firstName,
-    lastName,
-    emailId,
-    password,
-    age,
-    gender,
-    emailVerificationTokenHash: tokenHash,
-    emailVerificationExpiresAt: new Date(
-      Date.now() + EMAIL_VERIFICATION_EXPIRY_MS,
-    ),
-  });
-
-  await sendVerificationEmail(emailId, token);
-
-  return res.status(201).json({
-    success: true,
-    message: "Account created. Please verify your email.",
-    user: {
-      id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      emailId: user.emailId,
-      age: user.age,
-      gender: user.gender,
-      photoUrl: user.photoUrl,
-      about: user.about,
-      skills: user.skills,
-    },
-  });
-};
 
 // GET /users/:userId
 const getUser = async (req, res) => {
@@ -135,7 +94,6 @@ const getFeed = async (req, res) => {
 };
 
 module.exports = {
-  signup,
   getUser,
   updateUser,
   deleteUser,

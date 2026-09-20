@@ -2,17 +2,39 @@ const { z } = require("zod");
 
 const signupSchema = z
   .object({
-    firstName: z.string().trim().min(2).max(30),
+    firstName: z
+      .string()
+      .trim()
+      .min(2, "First name must be at least 2 characters")
+      .max(30, "First name must be 30 characters or less"),
 
-    lastName: z.string().trim().max(30).optional(),
+    lastName: z
+      .string()
+      .trim()
+      .max(30, "Last name must be 30 characters or less")
+      .optional(),
 
-    emailId: z.string().trim().toLowerCase().email(),
+    emailId: z
+      .email({
+        message: "Invalid email address",
+      })
+      .trim()
+      .toLowerCase(),
 
-    password: z.string().min(8).max(100),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(100, "Password must be 100 characters or less"),
 
-    age: z.number().int().min(18).max(100),
+    age: z
+      .number()
+      .int()
+      .min(18, "Age must be at least 18")
+      .max(100, "Age must be 100 or less"),
 
-    gender: z.enum(["male", "female", "other"]),
+    gender: z.enum(["male", "female", "other"], {
+      message: "Gender must be male, female, or other",
+    }),
   })
   .strict();
 
@@ -22,7 +44,12 @@ const updateUserSchema = z
 
     lastName: z.string().trim().max(30).optional(),
 
-    age: z.number().int().min(18).max(100).optional(),
+    age: z
+      .number()
+      .int()
+      .min(18, "Age must be at least 18")
+      .max(100, "Age must be 100 or less")
+      .optional(),
 
     gender: z.enum(["male", "female", "other"]).optional(),
 
@@ -30,10 +57,7 @@ const updateUserSchema = z
 
     about: z.string().trim().max(500).optional(),
 
-    skills: z
-      .array(z.string().trim().min(1))
-      .max(20)
-      .optional(),
+    skills: z.array(z.string().trim().min(1)).max(20).optional(),
   })
   .strict()
   .refine((data) => Object.keys(data).length > 0, {
@@ -42,9 +66,7 @@ const updateUserSchema = z
 
 const userIdSchema = z
   .object({
-    userId: z
-      .string()
-      .regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID"),
+    userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID"),
   })
   .strict();
 

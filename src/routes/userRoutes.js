@@ -1,12 +1,13 @@
 const express = require("express");
 
 const {
-  signup,
   getUser,
   getFeed,
   deleteUser,
   updateUser,
 } = require("../controllers/userController");
+const { signup } = require("../controllers/authController");
+
 const {
   signupSchema,
   updateUserSchema,

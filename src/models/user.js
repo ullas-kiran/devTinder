@@ -43,9 +43,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       select: false,
-      validate: {
-        validator: validator.isStrongPassword,
-      },
     },
     age: {
       type: Number,
