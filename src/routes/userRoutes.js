@@ -6,40 +6,36 @@ const {
   deleteUser,
   updateUser,
 } = require("../controllers/userController");
-const { signup } = require("../controllers/authController");
 
 const {
-  signupSchema,
   updateUserSchema,
   userIdSchema,
   feedQuerySchema,
 } = require("../validations/userValidation");
+
 const validate = require("../middleware/validate");
 const asyncHandler = require("../utils/asyncHandler");
+const authenticate = require("../middleware/authenticate");
 
 const router = express.Router();
 
-router.post("/signup", validate(signupSchema), asyncHandler(signup));
+router.use(authenticate);
 
-router.get(
-  "/users/:userId",
-  validate(userIdSchema, "params"),
-  asyncHandler(getUser),
-);
+router.get("/:userId", validate(userIdSchema, "params"), asyncHandler(getUser));
 
 router.patch(
-  "/users/:userId",
+  "/:userId",
   validate(userIdSchema, "params"),
   validate(updateUserSchema),
   asyncHandler(updateUser),
 );
 
 router.delete(
-  "/users/:userId",
+  "/:userId",
   validate(userIdSchema, "params"),
   asyncHandler(deleteUser),
 );
 
-router.get("/users", validate(feedQuerySchema, "query"), asyncHandler(getFeed));
+router.get("/feed", validate(feedQuerySchema, "query"), asyncHandler(getFeed));
 
 module.exports = router;

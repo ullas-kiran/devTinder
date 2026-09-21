@@ -19,8 +19,10 @@
   "license": "ISC",
   "dependencies": {
     "argon2": "0.45.1",
+    "cookie-parser": "1.4.7",
     "dotenv": "17.4.2",
     "express": "5.1.0",
+    "jsonwebtoken": "9.0.3",
     "mongoose": "9.10.1",
     "node-cron": "4.6.0",
     "validator": "13.15.35",

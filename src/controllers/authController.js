@@ -3,6 +3,11 @@ const ApiError = require("../utils/apiError");
 const { generateVerificationToken } = require("../utils/token");
 const { EMAIL_VERIFICATION_EXPIRY_MS } = require("../constants/auth");
 const { sendVerificationEmail } = require("../services/emailService");
+const { generateAccessToken } = require("../utils/jwt");
+
+const { generateRefreshToken } = require("../utils/token");
+
+const { RefreshToken } = require("../models/refreshToken");
 
 const signup = async (req, res) => {
   const { firstName, lastName, emailId, password, age, gender } = req.body;
@@ -61,10 +66,26 @@ const login = async (req, res) => {
   }
 
   // Authentication token/session comes here
+  const accessToken = generateAccessToken(user._id);
+  const { token: refreshToken, tokenHash } = generateRefreshToken();
+
+  await RefreshToken.create({
+    userId: user._id,
+    tokenHash,
+    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
 
   return res.status(200).json({
     success: true,
     message: "Login successful",
+    accessToken,
     user: {
       id: user._id,
       firstName: user.firstName,
