@@ -18,11 +18,11 @@ app.use(errorHandler);
 
 connectDb()
   .then(() => {
-    console.log("db connected success");
-    app.listen(3000, () => console.log("app running port 3000"));
+    console.warn("db connected success");
+    app.listen(3000, () => console.warn("app running on port 3000"));
     startCleanupJob();
   })
   .catch((err) => {
     console.error(err);
-    console.log("something went wrong");
+    console.error("something went wrong");
   });
