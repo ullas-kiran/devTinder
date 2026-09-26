@@ -1,13 +1,13 @@
 const { User } = require("../models/user");
 const ApiError = require("../utils/apiError");
-const { generateVerificationToken } = require("../utils/token");
+const { generateVerificationToken, hashToken } = require("../utils/token");
 const { EMAIL_VERIFICATION_EXPIRY_MS } = require("../constants/auth");
 const { sendVerificationEmail } = require("../services/emailService");
 const { generateAccessToken } = require("../utils/jwt");
 
 const { generateRefreshToken } = require("../utils/token");
 
-const { RefreshToken } = require("../models/refreshToken");
+const RefreshToken = require("../models/refreshToken");
 
 const signup = async (req, res) => {
   const { firstName, lastName, emailId, password, age, gender } = req.body;
@@ -100,7 +100,38 @@ const login = async (req, res) => {
   });
 };
 
+const verifyEmail = async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    throw ApiError.badRequest("Verification token is required");
+  }
+
+  const tokenHash = hashToken(token);
+
+  const user = await User.findOne({
+    emailVerificationTokenHash: tokenHash,
+    emailVerificationExpiresAt: { $gt: new Date() },
+  });
+
+  if (!user) {
+    throw ApiError.badRequest("Invalid or expired verification token");
+  }
+
+  user.emailVerified = true;
+  user.emailVerificationTokenHash = undefined;
+  user.emailVerificationExpiresAt = undefined;
+
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Email verified successfully",
+  });
+};
+
 module.exports = {
   signup,
   login,
+  verifyEmail,
 };
