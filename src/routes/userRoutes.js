@@ -1,7 +1,6 @@
 const express = require("express");
 
 const {
-  getUser,
   getFeed,
   deleteUser,
   updateUser,
@@ -20,8 +19,6 @@ const authenticate = require("../middleware/authenticate");
 const router = express.Router();
 
 router.use(authenticate);
-
-router.get("/:userId", validate(userIdSchema, "params"), asyncHandler(getUser));
 
 router.patch(
   "/:userId",
