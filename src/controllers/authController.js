@@ -8,6 +8,7 @@ const { generateAccessToken } = require("../utils/jwt");
 const { generateRefreshToken } = require("../utils/token");
 
 const RefreshToken = require("../models/refreshToken");
+const jwt = require("jsonwebtoken");
 
 const signup = async (req, res) => {
   const { firstName, lastName, emailId, password, age, gender } = req.body;
@@ -134,12 +135,53 @@ const logout = async (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict"
+    sameSite: "strict",
   });
 
   return res.status(200).json({
     success: true,
-    message: "Logged out successfully"
+    message: "Logged out successfully",
+  });
+};
+
+const refreshToken = async (req, res) => {
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    throw ApiError.unauthorized("Refresh token missing");
+  }
+
+  const storedToken = await RefreshToken.findOne({
+    token,
+  });
+
+  if (!storedToken) {
+    throw ApiError.unauthorized("Invalid refresh token");
+  }
+
+  if (storedToken.expiresAt < new Date()) {
+    await RefreshToken.deleteOne({ _id: storedToken._id });
+
+    throw ApiError.unauthorized("Refresh token expired");
+  }
+
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  } catch {
+    throw ApiError.unauthorized("Invalid refresh token");
+  }
+
+  const accessToken = jwt.sign(
+    { userId: decoded.userId },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "15m" },
+  );
+
+  return res.status(200).json({
+    success: true,
+    accessToken,
   });
 };
 
@@ -147,5 +189,6 @@ module.exports = {
   signup,
   login,
   verifyEmail,
-  logout
+  refreshToken,
+  logout,
 };

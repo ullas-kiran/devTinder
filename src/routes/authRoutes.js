@@ -5,6 +5,7 @@ const {
   login,
   verifyEmail,
   logout,
+  refreshToken,
 } = require("../controllers/authController");
 
 const { signupSchema, loginSchema } = require("../validations/authValidation");
@@ -19,5 +20,6 @@ router.post("/signup", validate(signupSchema), asyncHandler(signup));
 router.get("/verify-email", asyncHandler(verifyEmail));
 router.post("/login", validate(loginSchema), asyncHandler(login));
 router.post("/logout", authenticate, asyncHandler(logout));
+router.post("/refresh", asyncHandler(refreshToken));
 
 module.exports = router;
