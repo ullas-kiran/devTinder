@@ -2,27 +2,26 @@ const mongoose = require("mongoose");
 
 const connectionSchema = new mongoose.Schema(
   {
-    sender: {
+    fromUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
-    receiver: {
+    toUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected", "withdrawn"],
-      default: "pending",
+      enum: {
+        values: ["interested", "ignored", "accepted"],
+        message: "{VALUE} is not a valid status",
+      },
+      required: true,
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Connection", connectionSchema);

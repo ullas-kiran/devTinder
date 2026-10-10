@@ -1,17 +1,17 @@
 const express = require("express");
 const validate = require("../middleware/validate");
 const asyncHandler = require("../utils/asyncHandler");
-const {
-  sendConnectionRequestSchema,
-} = require("../validations/connectionValidation");
+const { connectionSchema } = require("../validations/connectionValidation");
 const {
   sendConnectionRequest,
 } = require("../controllers/connectionController");
+const authenticate = require("../middleware/authenticate");
 const router = express.Router();
 
 router.post(
   "/sendConnectionRequest",
-  validate(sendConnectionRequestSchema),
+  authenticate,
+  validate(connectionSchema),
   asyncHandler(sendConnectionRequest),
 );
 
