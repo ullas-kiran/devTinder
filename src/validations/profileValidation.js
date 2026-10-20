@@ -1,6 +1,6 @@
 const { z } = require("zod");
 
-const updateUserSchema = z
+const updateProfileSchema = z
   .object({
     firstName: z.string().trim().min(2).max(30).optional(),
 
@@ -26,7 +26,7 @@ const updateUserSchema = z
     message: "At least one field is required to update",
   });
 
-const userIdSchema = z
+const userIdParamSchema = z
   .object({
     userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID"),
   })
@@ -41,7 +41,7 @@ const feedQuerySchema = z
   .strict();
 
 module.exports = {
-  updateUserSchema,
-  userIdSchema,
+  updateProfileSchema,
+  userIdParamSchema,
   feedQuerySchema,
 };

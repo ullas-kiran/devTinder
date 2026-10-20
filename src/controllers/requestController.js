@@ -1,21 +1,11 @@
-const mongoose = require("mongoose");
 const Connection = require("../models/connection");
 const { User } = require("../models/user");
 const ApiError = require("../utils/apiError");
 
-const sendConnectionRequest = async (req, res) => {
+// POST /requests
+const sendRequest = async (req, res) => {
   const fromUserId = req.user.id;
   const { toUserId, status } = req.body;
-
-  // Validate swipe status
-  if (!["interested", "ignored"].includes(status)) {
-    throw ApiError.badRequest("Invalid swipe status");
-  }
-
-  // Validate user ID
-  if (!mongoose.isValidObjectId(toUserId)) {
-    throw ApiError.badRequest("Invalid user ID");
-  }
 
   // Prevent swiping on yourself
   if (fromUserId.toString() === toUserId.toString()) {
@@ -23,23 +13,19 @@ const sendConnectionRequest = async (req, res) => {
   }
 
   // Check receiver exists
-  const receiver = await User.findById(toUserId);
+  const receiver = await User.exists({ _id: toUserId });
 
   if (!receiver) {
     throw ApiError.notFound("User not found");
   }
 
   // Check if this user already swiped on receiver
-  const existingRequest = await Connection.findOne({
-    fromUserId,
-    toUserId,
-  });
+  const existingRequest = await Connection.exists({ fromUserId, toUserId });
 
   if (existingRequest) {
     throw ApiError.conflict("You have already swiped on this user");
   }
 
-  // Create swipe
   const connection = await Connection.create({
     fromUserId,
     toUserId,
@@ -56,6 +42,4 @@ const sendConnectionRequest = async (req, res) => {
   });
 };
 
-module.exports = {
-  sendConnectionRequest,
-};
+module.exports = { sendRequest };
