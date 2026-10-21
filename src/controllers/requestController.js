@@ -2,7 +2,7 @@ const Connection = require("../models/connection");
 const { User } = require("../models/user");
 const ApiError = require("../utils/apiError");
 
-// POST /requests
+// POST /requests  { toUserId, status }
 const sendRequest = async (req, res) => {
   const fromUserId = req.user.id;
   const { toUserId, status } = req.body;
@@ -20,7 +20,12 @@ const sendRequest = async (req, res) => {
   }
 
   // Check if this user already swiped on receiver
-  const existingRequest = await Connection.exists({ fromUserId, toUserId });
+  const existingRequest = await Connection.findOne({
+    $or: [
+      { fromUserId, toUserId },
+      { fromUserId: toUserId, toUserId: fromUserId },
+    ],
+  });
 
   if (existingRequest) {
     throw ApiError.conflict("You have already swiped on this user");
