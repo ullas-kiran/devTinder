@@ -24,4 +24,15 @@ const connectionSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+connectionSchema.pre("validate", function () {
+  const connectionReq = this;
+  if (
+    connectionReq.fromUserId &&
+    connectionReq.toUserId &&
+    connectionReq.fromUserId.equals(connectionReq.toUserId)
+  ) {
+    connectionReq.invalidate("toUserId", "You cannot connect with yourself");
+  }
+});
+
 module.exports = mongoose.model("Connection", connectionSchema);
